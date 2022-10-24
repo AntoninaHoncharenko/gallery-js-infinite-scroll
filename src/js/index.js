@@ -4,14 +4,12 @@ import { createMarkup } from './createMarkup';
 import { ApiService } from './APIservice';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import { addSmoothScroll } from './scroll';
 import { addSimpleLightbox } from './simpleLightbox';
 
 const apiService = new ApiService();
 
 const refs = {
   form: document.querySelector('.search-form'),
-  loadmoreBtn: document.querySelector('.load-more'),
   gallery: document.querySelector('.gallery'),
 };
 
@@ -22,7 +20,6 @@ async function onFormSubmit(event) {
   apiService.query = event.currentTarget.elements.searchQuery.value.trim();
   refs.form.reset();
   clearMarkup();
-  refs.loadmoreBtn.classList.add('is-hidden');
 
   apiService.resetPage();
 
@@ -46,12 +43,9 @@ async function onFormSubmit(event) {
     appendMarkup(hits);
 
     if (apiService.page === apiService.totalPages) {
-      refs.loadmoreBtn.classList.add('is-hidden');
       Notify.warning(
         'We are sorry, but you have reached the end of search results.'
       );
-    } else {
-      refs.loadmoreBtn.classList.remove('is-hidden');
     }
 
     addSimpleLightbox();
@@ -59,31 +53,6 @@ async function onFormSubmit(event) {
     apiService.incrementPage();
   } catch (error) {
     console.log(error.message);
-  }
-}
-
-refs.loadmoreBtn.addEventListener('click', onLoadMoreBtn);
-
-async function onLoadMoreBtn() {
-  try {
-    const { hits, totalHits } = await apiService.fetchImages();
-
-    appendMarkup(hits);
-
-    addSmoothScroll();
-
-    addSimpleLightbox();
-
-    if (apiService.page === apiService.totalPages) {
-      refs.loadmoreBtn.classList.add('is-hidden');
-      Notify.warning(
-        'We are sorry, but you have reached the end of search results.'
-      );
-    }
-
-    apiService.incrementPage();
-  } catch (error) {
-    console.log(error);
   }
 }
 
