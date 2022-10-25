@@ -13,6 +13,36 @@ const refs = {
   gallery: document.querySelector('.gallery'),
 };
 
+const options = {
+  root: null,
+  rootMargin: '100px',
+  threshold: 1.0,
+};
+const callback = async function (entries, observer) {
+  entries.forEach(async entry => {
+    if (entry.isIntersecting) {
+      apiService.incrementPage();
+      observer.unobserve(entry.target);
+
+      try {
+        const { hits, totalHits } = await apiService.fetchImages();
+
+        appendMarkup(hits);
+
+        addSimpleLightbox();
+
+        addObserve();
+
+        notificOnImagesEnd();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  });
+};
+
+const observer = new IntersectionObserver(callback, options);
+
 refs.form.addEventListener('submit', onFormSubmit);
 
 async function onFormSubmit(event) {
@@ -42,15 +72,11 @@ async function onFormSubmit(event) {
 
     appendMarkup(hits);
 
-    if (apiService.page === apiService.totalPages) {
-      Notify.warning(
-        'We are sorry, but you have reached the end of search results.'
-      );
-    }
+    addObserve();
 
     addSimpleLightbox();
 
-    apiService.incrementPage();
+    notificOnImagesEnd();
   } catch (error) {
     console.log(error.message);
   }
@@ -70,4 +96,19 @@ function notificOnErrorFetch() {
     'Sorry, there are no images matching your search query. Please try again.',
     { clickToClose: true }
   );
+}
+
+function notificOnImagesEnd() {
+  if (apiService.page === apiService.totalPages) {
+    Notify.warning(
+      'We are sorry, but you have reached the end of search results.'
+    );
+  }
+}
+
+function addObserve() {
+  if (apiService.page < apiService.totalPages) {
+    const target = document.querySelector('.photo-card:last-child');
+    observer.observe(target);
+  }
 }
