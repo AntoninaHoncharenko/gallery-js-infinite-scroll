@@ -1,7 +1,5 @@
 import axios from 'axios';
 axios.defaults.baseURL = 'https://pixabay.com/api/';
-// axios.defaults.headers.common['Authorization'] =
-//   '30659644-d62c8c976bf0a1f367dc53c1a';
 
 export class ApiService {
   constructor() {
@@ -19,7 +17,6 @@ export class ApiService {
   }
 
   async fetchImages() {
-    // const BASE_URL = 'https://pixabay.com/api/';
     const KEY = '30659644-d62c8c976bf0a1f367dc53c1a';
     const url = `?key=${KEY}&q=${this.searchQuery}&page=${this.page}&per_page=${this.perPage}`;
 
@@ -46,8 +43,4 @@ export class ApiService {
   calculateTotalPages(total) {
     this.totalPages = Math.ceil(total / this.perPage);
   }
-
-  // get isShowLoadMoreBtn() {
-  //   return this.page <= this.totalPages;
-  // }
 }
